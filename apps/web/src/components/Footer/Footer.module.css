@@ -1,0 +1,85 @@
+.footer { background: #121212; border-top: 1px solid #E0E0E0; }
+
+.inner {
+  display: grid;
+  grid-template-columns: 1.8fr 1fr 1fr 1.2fr;
+  gap: clamp(28px, 5vw, 60px);
+  padding-block: clamp(50px, 8vw, 80px);
+}
+
+/* Brand */
+.brand { display: flex; flex-direction: column; gap: 16px; }
+.logo { display: flex; align-items: center; gap: 8px; }
+.logoIcon { color: var(--color-primary); font-size: 1.1rem; }
+.logoText {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #FFFFFF;
+}
+.logoText em { font-style: normal; color: var(--color-primary); }
+.tagline { font-size: 0.875rem; color: #9E9E9E; line-height: 1.7; }
+
+.socials { display: flex; gap: 10px; margin-top: 4px; }
+.social {
+  width: 38px; height: 38px;
+  background: #1E1E1E;
+  border: 1px solid #333333;
+  border-radius: var(--radius-md);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.95rem;
+  color: #9E9E9E;
+  transition: all var(--t-base);
+}
+.social:hover { border-color: var(--color-primary); color: var(--color-primary); transform: translateY(-2px); }
+
+/* Columns */
+.col { display: flex; flex-direction: column; gap: 12px; }
+.colTitle {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+  margin-bottom: 4px;
+}
+.colLinks { display: flex; flex-direction: column; gap: 8px; }
+.colLink {
+  font-size: 0.875rem;
+  color: #9E9E9E;
+  transition: color var(--t-fast);
+}
+.colLink:hover { color: var(--color-primary); }
+
+.contactList {
+  display: flex; flex-direction: column; gap: 10px;
+}
+.contactList li {
+  font-size: 0.875rem;
+  color: #9E9E9E;
+  line-height: 1.5;
+}
+
+/* Bottom Bar */
+.bar {
+  border-top: 1px solid #333333;
+  padding-block: 18px;
+}
+.bar > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 0.78rem;
+  color: #757575;
+}
+.barRight { color: #757575; }
+
+@media (max-width: 900px) {
+  .inner { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 560px) {
+  .inner { grid-template-columns: 1fr; }
+  .bar > div { justify-content: center; text-align: center; }
+}

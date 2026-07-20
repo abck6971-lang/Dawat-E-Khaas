@@ -1,0 +1,113 @@
+.deals { background: var(--color-bg); }
+.header { text-align: center; margin-bottom: 48px; }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.card {
+  position: relative;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  transition: all var(--t-base);
+  display: flex;
+  flex-direction: column;
+}
+.card:hover {
+  transform: translateY(-6px);
+  border-color: var(--color-border-hover);
+  box-shadow: var(--shadow-hover);
+}
+.featured {
+  border-color: rgba(200,168,75,0.45);
+  transform: scale(1.03);
+  box-shadow: var(--shadow-gold), var(--shadow-card);
+}
+.featured:hover { transform: scale(1.03) translateY(-6px); }
+
+.saveBadge {
+  position: absolute;
+  top: 14px; right: 14px;
+  z-index: 2;
+  background: var(--color-cta);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: var(--radius-pill);
+  letter-spacing: 0.05em;
+}
+
+.imgWrap {
+  position: relative;
+  height: 200px;
+  overflow: hidden;
+}
+.imgWrap img { transition: transform var(--t-slow); }
+.card:hover .imgWrap img { transform: scale(1.08); }
+.imgOverlay {
+  position: absolute; inset: 0;
+  background: var(--gradient-card);
+}
+
+.content {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+.tag {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--color-primary);
+  text-transform: uppercase;
+}
+.title {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--color-text);
+  line-height: 1.2;
+}
+.desc {
+  font-size: 0.83rem;
+  color: var(--color-text-muted);
+  line-height: 1.6;
+  flex: 1;
+}
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 8px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.pricing { display: flex; flex-direction: column; gap: 2px; }
+.price {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+.original {
+  font-size: 0.8rem;
+  color: var(--color-text-subtle);
+  text-decoration: line-through;
+}
+
+@media (max-width: 900px) {
+  .grid { grid-template-columns: 1fr; max-width: 480px; margin-inline: auto; }
+  .featured { transform: scale(1); }
+  .featured:hover { transform: translateY(-6px); }
+}
+@media (min-width: 601px) and (max-width: 900px) {
+  .grid { grid-template-columns: 1fr 1fr; max-width: 100%; }
+}
