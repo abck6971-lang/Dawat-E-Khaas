@@ -2,7 +2,7 @@ import { getUnsyncedOrders, markOrderSynced } from './database.js';
 
 // In production, this would be your Vercel URL (e.g. https://dawat-e-khaas.vercel.app)
 // For local testing, we use the local web app
-const API_URL = process.env.VITE_API_URL || 'http://localhost:3000';
+const API_URL = process.env.VITE_API_URL || 'https://dawat-e-khaas-web.vercel.app';
 
 export async function syncOfflineOrders() {
   const unsynced = getUnsyncedOrders();

@@ -67,7 +67,7 @@ const DEFAULT_SETTINGS: POSSettings = {
   restaurantName: 'Dawat-E-Khaas',
   restaurantPhone: '+92 300 0000000',
   restaurantAddress: 'Main Boulevard, Your City',
-  apiUrl: 'http://localhost:3000',
+  apiUrl: 'https://dawat-e-khaas-web.vercel.app',
   taxPercent: 0,
   selectedPrinter: '',
   autoPrint: false,
