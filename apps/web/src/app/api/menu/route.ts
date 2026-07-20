@@ -16,6 +16,6 @@ export async function GET() {
     return NextResponse.json({ categories, menuItems });
   } catch (err) {
     console.error('[public menu GET]', err);
-    return NextResponse.json({ categories: [], menuItems: [] });
+    return NextResponse.json({ categories: [], menuItems: [], error: String(err) });
   }
 }
