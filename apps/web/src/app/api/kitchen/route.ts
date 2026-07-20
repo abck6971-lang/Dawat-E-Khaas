@@ -6,7 +6,7 @@ export async function GET() {
   try {
     const activeOrders = await prisma.order.findMany({
       where: {
-        status: { in: ['PENDING', 'PREPARING', 'READY'] },
+        status: { in: ['PENDING', 'PREPARING'] },
       },
       include: {
         customer: true,
