@@ -21,10 +21,17 @@
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.mahadhassan.dawatekhaas"
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "83c8ab4b-432d-4e6e-adce-02c509c44b88"
+      }
+    },
+    "owner": "mahadhassan"
   }
 }

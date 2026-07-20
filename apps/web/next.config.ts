@@ -16,9 +16,6 @@ const nextConfig: NextConfig = {
     ]
   },
   serverExternalPackages: ['@prisma/client', '@repo/database'],
-  outputFileTracingIncludes: {
-    '/api/**/*': ['../../packages/database/prisma/generated/client/**/*.node'],
-  },
 };
 
 export default nextConfig;
