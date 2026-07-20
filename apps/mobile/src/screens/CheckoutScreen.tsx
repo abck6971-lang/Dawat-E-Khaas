@@ -18,6 +18,7 @@ export default function CheckoutScreen({ navigation }: any) {
   const { items, getSubtotal, clearCart } = useCartStore();
 
   const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [orderType, setOrderType] = useState<'Pickup' | 'Delivery'>('Pickup');
   const [address, setAddress] = useState('');
@@ -31,6 +32,7 @@ export default function CheckoutScreen({ navigation }: any) {
 
   const handlePlaceOrder = async () => {
     if (!name.trim()) { setError('Please enter your name.'); return; }
+    if (!email.trim()) { setError('Please enter your email.'); return; }
     if (!phone.trim()) { setError('Please enter your phone number.'); return; }
     if (orderType === 'Delivery' && !address.trim()) { setError('Please enter your delivery address.'); return; }
 
@@ -40,6 +42,7 @@ export default function CheckoutScreen({ navigation }: any) {
     const result = await placeOrder(
       items,
       name.trim(),
+      email.trim(),
       phone.trim(),
       orderType === 'Pickup' ? 'Pickup' : address.trim(),
       notes.trim(),
@@ -71,6 +74,15 @@ export default function CheckoutScreen({ navigation }: any) {
             placeholderTextColor="#94a3b8"
             value={name}
             onChangeText={setName}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Email Address *"
+            placeholderTextColor="#94a3b8"
+            keyboardType="email-address"
+            autoCapitalize="none"
+            value={email}
+            onChangeText={setEmail}
           />
           <TextInput
             style={styles.input}

@@ -3,6 +3,7 @@ import { CartItem } from '../store/useCartStore';
 
 export interface PlaceOrderPayload {
   name: string;
+  email: string;
   phone: string;
   address: string;
   notes?: string;
@@ -23,6 +24,7 @@ export interface PlaceOrderResult {
 export async function placeOrder(
   cartItems: CartItem[],
   customerName: string,
+  email: string,
   phone: string,
   address: string,
   notes: string,
@@ -31,6 +33,7 @@ export async function placeOrder(
   try {
     const payload: PlaceOrderPayload = {
       name: customerName,
+      email,
       phone,
       address,
       notes,
