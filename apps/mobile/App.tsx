@@ -13,6 +13,7 @@ import { StatusBar as ExpoStatusBar } from 'expo-status-bar';
 import TabNavigator from './src/navigation/TabNavigator';
 import MenuScreen from './src/screens/MenuScreen';
 import OrderConfirmationScreen from './src/screens/OrderConfirmationScreen';
+import TrackOrderScreen from './src/screens/TrackOrderScreen';
 import { useAuthStore } from './src/store/useAuthStore';
 
 const Stack = createNativeStackNavigator();
@@ -62,9 +63,6 @@ function SplashScreen({ onFinish }: { onFinish: () => void }) {
     <Animated.View style={[styles.splash, { opacity: screenOpacity }]}>
       <StatusBar barStyle="light-content" backgroundColor="#0A1C12" />
 
-      {/* Decorative top arc */}
-      <View style={styles.topArc} />
-
       {/* Logo */}
       <Animated.View
         style={{
@@ -92,9 +90,6 @@ function SplashScreen({ onFinish }: { onFinish: () => void }) {
         <Animated.Text style={styles.brandName}>Dawat-E-Khaas</Animated.Text>
         <Animated.Text style={styles.tagline}>Fine Dining · Delivered</Animated.Text>
       </Animated.View>
-
-      {/* Decorative bottom arc */}
-      <View style={styles.bottomArc} />
     </Animated.View>
   );
 }
@@ -107,6 +102,7 @@ function MainApp() {
         <Stack.Screen name="MainTabs" component={TabNavigator} />
         <Stack.Screen name="Menu" component={MenuScreen} />
         <Stack.Screen name="OrderConfirmation" component={OrderConfirmationScreen} />
+        <Stack.Screen name="TrackOrder" component={TrackOrderScreen} />
       </Stack.Navigator>
       <ExpoStatusBar style="auto" />
     </NavigationContainer>

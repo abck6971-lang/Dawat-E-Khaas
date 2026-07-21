@@ -63,3 +63,25 @@ export async function placeOrder(
     return { success: false, error: 'Network error. Please check your connection.' };
   }
 }
+
+export interface TrackOrderResult {
+  success: boolean;
+  order?: any;
+  error?: string;
+}
+
+export async function trackOrder(orderId: string): Promise<TrackOrderResult> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/track/${orderId}`);
+    const data = await response.json();
+    
+    if (!response.ok) {
+      return { success: false, error: data.error || 'Failed to track order' };
+    }
+    
+    return { success: true, order: data };
+  } catch (error) {
+    console.error('Error tracking order:', error);
+    return { success: false, error: 'Network error. Please check your connection.' };
+  }
+}

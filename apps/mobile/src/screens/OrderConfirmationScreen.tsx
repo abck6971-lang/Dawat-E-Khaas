@@ -1,31 +1,125 @@
 import React, { useEffect, useState } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity,
-  SafeAreaView, StatusBar, Image, ScrollView
+  SafeAreaView, StatusBar, Image, ScrollView,
+  ActivityIndicator,
+  Clipboard,
+  Alert
 } from 'react-native';
-import { Check, Bike, Clock, Flame } from 'lucide-react-native';
-import { useNavigation } from '@react-navigation/native';
-import { useCartStore } from '../store/useCartStore';
+import { Check, Bike, Clock, Flame, Copy, ChefHat, CheckCircle2 } from 'lucide-react-native';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { trackOrder } from '../services/orders';
 import { colors } from '../theme/colors';
-import { CartItem } from '../types';
 
 export default function OrderConfirmationScreen() {
   const navigation = useNavigation();
-  const { items, orderType, clearCart } = useCartStore();
+  const route = useRoute<any>();
+  const orderId = route.params?.orderId;
   
-  // We snapshot the cart items into local state when the screen loads
-  // so that if we clear the global cart, the screen still shows what was ordered.
-  const [orderedItems] = useState<CartItem[]>(items);
-  const [snapshotOrderType] = useState(orderType);
-  
-  const subtotal = orderedItems.reduce((sum, item) => sum + Number(item.price) * item.quantity, 0);
-  const deliveryFee = orderedItems.length > 0 && snapshotOrderType === 'delivery' ? 15 : 0;
-  const total = subtotal + deliveryFee;
+  const [order, setOrder] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchOrder = async () => {
+    if (!orderId) {
+      setError('No order ID provided.');
+      setLoading(false);
+      return;
+    }
+    const result = await trackOrder(orderId);
+    if (result.success && result.order) {
+      setOrder(result.order);
+      setError(null);
+    } else {
+      // Don't overwrite existing order if polling fails briefly
+      if (!order) setError(result.error || 'Failed to load order.');
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchOrder();
+    // Poll every 10 seconds
+    const interval = setInterval(fetchOrder, 10000);
+    return () => clearInterval(interval);
+  }, [orderId]);
 
   const handleBackToHome = () => {
-    // Navigate back to the tab navigator (Home tab)
     navigation.navigate('MainTabs' as never);
   };
+
+  const copyOrderId = () => {
+    if (orderId) {
+      Clipboard.setString(orderId);
+      Alert.alert('Copied!', 'Order ID copied to clipboard');
+    }
+  };
+
+  if (loading && !order) {
+    return (
+      <SafeAreaView style={[styles.safeArea, { justifyContent: 'center', alignItems: 'center' }]}>
+        <ActivityIndicator size="large" color={colors.primary} />
+        <Text style={{ marginTop: 12, color: colors.textMuted }}>Loading your order...</Text>
+      </SafeAreaView>
+    );
+  }
+
+  if (error && !order) {
+    return (
+      <SafeAreaView style={[styles.safeArea, { justifyContent: 'center', alignItems: 'center' }]}>
+        <Flame size={40} color={colors.error} />
+        <Text style={{ marginTop: 12, color: colors.error }}>{error}</Text>
+        <TouchableOpacity style={styles.homeBtn} onPress={handleBackToHome}>
+          <Text style={styles.homeBtnText}>Back To Home</Text>
+        </TouchableOpacity>
+      </SafeAreaView>
+    );
+  }
+
+  if (!order) return null;
+
+  // Calculate totals
+  const subtotal = order.orderItems.reduce((sum: number, item: any) => sum + (Number(item.unitPrice) * item.quantity), 0);
+  const total = Number(order.totalAmount);
+  const deliveryFee = total - subtotal; // Rough calculation, or just display from order if needed
+  
+  // Status UI mapping
+  const getStatusConfig = () => {
+    switch (order.status) {
+      case 'PENDING':
+        return {
+          icon: <Clock size={24} color={colors.text} strokeWidth={2} />,
+          title: 'Order Received',
+          desc: 'Waiting for restaurant to confirm',
+        };
+      case 'PREPARING':
+        return {
+          icon: <ChefHat size={24} color={colors.text} strokeWidth={2} />,
+          title: 'Preparing your food',
+          desc: 'The chef is working on your order',
+        };
+      case 'COMPLETED':
+        return {
+          icon: <CheckCircle2 size={24} color={colors.primary} strokeWidth={2} />,
+          title: 'Order Completed!',
+          desc: 'Enjoy your food!',
+        };
+      case 'CANCELLED':
+        return {
+          icon: <Flame size={24} color={colors.error} strokeWidth={2} />,
+          title: 'Order Cancelled',
+          desc: 'This order was cancelled.',
+        };
+      default:
+        return {
+          icon: <Clock size={24} color={colors.text} strokeWidth={2} />,
+          title: order.status,
+          desc: 'Processing your order',
+        };
+    }
+  };
+
+  const statusConfig = getStatusConfig();
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -37,29 +131,43 @@ export default function OrderConfirmationScreen() {
           <View style={styles.checkCircle}>
             <Check size={32} color="#FFFFFF" strokeWidth={3} />
           </View>
-          <Text style={styles.title}>Order Confirmed!</Text>
-          <Text style={styles.subtitle}>Thank you! Your order has been{"\n"}placed Successfully.</Text>
+          <Text style={styles.title}>Track Order</Text>
+          <Text style={styles.subtitle}>Order ID: {orderId}</Text>
+          <TouchableOpacity onPress={copyOrderId} style={styles.copyBtn}>
+            <Copy size={14} color={colors.primary} />
+            <Text style={styles.copyText}>Copy ID</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Live Status Card */}
+        <View style={[styles.statusCard, { borderColor: colors.primary, borderWidth: 1 }]}>
+          <View style={styles.statusIcon}>{statusConfig.icon}</View>
+          <View style={styles.statusTextContainer}>
+            <Text style={styles.statusTitle}>{statusConfig.title}</Text>
+            <Text style={styles.statusDesc}>{statusConfig.desc}</Text>
+          </View>
+          <ActivityIndicator size="small" color={colors.primary} animating={order.status === 'PENDING' || order.status === 'PREPARING'} />
         </View>
 
         {/* Order Details Card */}
         <View style={styles.card}>
           <Text style={styles.cardTitle}>Order Details</Text>
           
-          {orderedItems.map((item, index) => (
+          {order.orderItems.map((item: any, index: number) => (
             <View key={`${item.id}-${index}`} style={styles.itemRow}>
               <View style={styles.imageBlock}>
-                {item.imageUrl ? (
-                  <Image source={{ uri: item.imageUrl }} style={styles.itemImage} />
+                {item.menuItem?.imageUrl ? (
+                  <Image source={{ uri: item.menuItem.imageUrl }} style={styles.itemImage} />
                 ) : (
                   <Flame size={20} color={colors.textMuted} strokeWidth={1.5} />
                 )}
               </View>
               <View style={styles.itemInfo}>
-                <Text style={styles.itemName}>{item.name}</Text>
-                <Text style={styles.itemQty}>{item.quantity} x Rs. {Number(item.price).toFixed(0)}</Text>
+                <Text style={styles.itemName}>{item.menuItem?.name || 'Item'}</Text>
+                <Text style={styles.itemQty}>{item.quantity} x Rs. {Number(item.unitPrice).toFixed(0)}</Text>
               </View>
               <Text style={styles.itemTotal}>
-                Rs. {(item.quantity * Number(item.price)).toFixed(0)}
+                Rs. {(item.quantity * Number(item.unitPrice)).toFixed(0)}
               </Text>
             </View>
           ))}
@@ -70,33 +178,18 @@ export default function OrderConfirmationScreen() {
             <Text style={styles.summaryLabel}>Subtotal</Text>
             <Text style={styles.summaryValue}>Rs. {subtotal.toFixed(0)}</Text>
           </View>
-          <View style={styles.summaryRow}>
-            <Text style={styles.summaryLabel}>{snapshotOrderType === 'delivery' ? 'Delivery Fee' : 'Pickup'}</Text>
-            <Text style={styles.summaryValue}>{snapshotOrderType === 'pickup' ? 'Free' : `Rs. ${deliveryFee.toFixed(0)}`}</Text>
-          </View>
+          {deliveryFee > 0 && (
+            <View style={styles.summaryRow}>
+              <Text style={styles.summaryLabel}>Tax/Fees</Text>
+              <Text style={styles.summaryValue}>Rs. {deliveryFee.toFixed(0)}</Text>
+            </View>
+          )}
           
           <View style={styles.dottedLine} />
           
           <View style={styles.summaryRow}>
             <Text style={styles.totalLabel}>TOTAL</Text>
             <Text style={styles.totalValue}>Rs. {total.toFixed(0)}</Text>
-          </View>
-        </View>
-
-        {/* Status Cards */}
-        <View style={styles.statusCard}>
-          <Bike size={24} color={colors.text} strokeWidth={2} style={styles.statusIcon} />
-          <View style={styles.statusTextContainer}>
-            <Text style={styles.statusTitle}>Your order is on its way!</Text>
-            <Text style={styles.statusDesc}>We'll notify you when your rider is in nearby</Text>
-          </View>
-        </View>
-
-        <View style={styles.statusCard}>
-          <Clock size={24} color={colors.text} strokeWidth={2} style={styles.statusIcon} />
-          <View style={styles.statusTextContainer}>
-            <Text style={styles.statusTitle}>Estimated Delivery Time</Text>
-            <Text style={styles.statusDesc}>25 - 35 min</Text>
           </View>
         </View>
 
@@ -128,7 +221,7 @@ const styles = StyleSheet.create({
   // Success Header
   successHeader: {
     alignItems: 'center',
-    marginBottom: 32,
+    marginBottom: 24,
   },
   checkCircle: {
     width: 64,
@@ -148,13 +241,27 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '800',
     color: colors.text,
-    marginBottom: 8,
+    marginBottom: 4,
   },
   subtitle: {
     fontSize: 14,
     color: '#888888',
     textAlign: 'center',
-    lineHeight: 20,
+  },
+  copyBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 8,
+    backgroundColor: '#FFEADD',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 12,
+  },
+  copyText: {
+    marginLeft: 6,
+    color: colors.primary,
+    fontWeight: '600',
+    fontSize: 12,
   },
 
   // Details Card

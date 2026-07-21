@@ -366,10 +366,15 @@ export default function HomeScreen() {
             <Text style={styles.heroTag}>LIMITED OFFER</Text>
             <Text style={styles.heroTitle}>20% Off Today</Text>
             <Text style={styles.heroSub}>On all Karahi & BBQ dishes</Text>
-            <TouchableOpacity style={styles.heroBtn} activeOpacity={0.85}>
-              <Text style={styles.heroBtnText}>Order Now</Text>
-              <ChevronRight size={14} color={colors.primary} strokeWidth={2.5} />
-            </TouchableOpacity>
+            <View style={{ flexDirection: 'row', gap: 12 }}>
+              <TouchableOpacity style={styles.heroBtn} activeOpacity={0.85} onPress={() => navigation.navigate('Menu' as never)}>
+                <Text style={styles.heroBtnText}>Order Now</Text>
+                <ChevronRight size={14} color={colors.primary} strokeWidth={2.5} />
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.heroBtn, { backgroundColor: 'rgba(255,255,255,0.25)' }]} activeOpacity={0.85} onPress={() => navigation.navigate('TrackOrder' as never)}>
+                <Text style={[styles.heroBtnText, { color: '#fff' }]}>Track Order</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
 
