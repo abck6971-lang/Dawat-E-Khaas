@@ -10,6 +10,7 @@ import { Check, Bike, Clock, Flame, Copy, ChefHat, CheckCircle2 } from 'lucide-r
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { trackOrder } from '../services/orders';
 import { colors } from '../theme/colors';
+import { API_BASE_URL } from '../config/api';
 
 export default function OrderConfirmationScreen() {
   const navigation = useNavigation();
@@ -121,6 +122,8 @@ export default function OrderConfirmationScreen() {
 
   const statusConfig = getStatusConfig();
 
+  const baseUrl = API_BASE_URL.replace('/api', '');
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" backgroundColor="#EFEFEF" />
@@ -153,11 +156,14 @@ export default function OrderConfirmationScreen() {
         <View style={styles.card}>
           <Text style={styles.cardTitle}>Order Details</Text>
           
-          {order.orderItems.map((item: any, index: number) => (
+          {order.orderItems.map((item: any, index: number) => {
+            let imgUri = item.menuItem?.imageUrl;
+            if (imgUri && imgUri.startsWith('/')) imgUri = `${baseUrl}${imgUri}`;
+            return (
             <View key={`${item.id}-${index}`} style={styles.itemRow}>
               <View style={styles.imageBlock}>
-                {item.menuItem?.imageUrl ? (
-                  <Image source={{ uri: item.menuItem.imageUrl }} style={styles.itemImage} />
+                {imgUri ? (
+                  <Image source={{ uri: imgUri }} style={styles.itemImage} />
                 ) : (
                   <Flame size={20} color={colors.textMuted} strokeWidth={1.5} />
                 )}
@@ -170,7 +176,7 @@ export default function OrderConfirmationScreen() {
                 Rs. {(item.quantity * Number(item.unitPrice)).toFixed(0)}
               </Text>
             </View>
-          ))}
+          )})}
 
           <View style={styles.dottedLine} />
 
