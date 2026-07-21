@@ -17,7 +17,6 @@ import TrackOrderScreen from './src/screens/TrackOrderScreen';
 import { useAuthStore } from './src/store/useAuthStore';
 
 const Stack = createNativeStackNavigator();
-const { width: SW, height: SH } = Dimensions.get('window');
 
 // ── ANIMATED SPLASH SCREEN ────────────────────────────────────────────────────
 function SplashScreen({ onFinish }: { onFinish: () => void }) {
@@ -27,7 +26,6 @@ function SplashScreen({ onFinish }: { onFinish: () => void }) {
   const screenOpacity = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
-    // Phase 1 — logo appears + grows
     Animated.parallel([
       Animated.spring(logoScale, {
         toValue: 1,
@@ -41,13 +39,11 @@ function SplashScreen({ onFinish }: { onFinish: () => void }) {
         useNativeDriver: true,
       }),
     ]).start(() => {
-      // Phase 2 — tagline fades in
       Animated.timing(textOpacity, {
         toValue: 1,
         duration: 400,
         useNativeDriver: true,
       }).start(() => {
-        // Hold for 1 second, then fade out entire splash
         setTimeout(() => {
           Animated.timing(screenOpacity, {
             toValue: 0,
@@ -118,11 +114,8 @@ export default function App() {
   }, []);
 
   return (
-    <View style={{ flex: 1 }}>
-      {/* Main app renders behind the splash */}
+    <View style={{ flex: 1, backgroundColor: '#0A1C12' }}>
       {splashDone && <MainApp />}
-
-      {/* Splash sits on top until its animation finishes */}
       {!splashDone && (
         <SplashScreen onFinish={() => setSplashDone(true)} />
       )}
@@ -132,29 +125,15 @@ export default function App() {
 
 const styles = StyleSheet.create({
   splash: {
-    ...StyleSheet.absoluteFillObject,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     backgroundColor: '#0A1C12',
     alignItems: 'center',
     justifyContent: 'center',
     zIndex: 999,
-  },
-
-  // Decorative curved arcs
-  topArc: {
-    position: 'absolute',
-    top: -SW * 0.4,
-    width: SW * 1.4,
-    height: SW * 1.4,
-    borderRadius: SW * 0.7,
-    backgroundColor: 'rgba(200,168,75,0.06)',
-  },
-  bottomArc: {
-    position: 'absolute',
-    bottom: -SW * 0.5,
-    width: SW * 1.6,
-    height: SW * 1.6,
-    borderRadius: SW * 0.8,
-    backgroundColor: 'rgba(200,168,75,0.04)',
   },
 
   // Logo ring frame
