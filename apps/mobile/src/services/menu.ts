@@ -11,12 +11,12 @@ export async function getMenuData(): Promise<MenuResponse | null> {
     
     const data: MenuResponse = await response.json();
     
-    // The web API returns relative URLs for images (e.g. /uploads/image.png)
-    // The mobile app needs absolute URLs to display them.
-    const baseUrl = API_BASE_URL.replace('/api', '');
+    // Images are always served from Vercel (production host), even in dev mode.
+    // Dev API might point to local IP but images only exist on the deployed website.
+    const IMAGE_BASE_URL = 'https://dawat-e-khaas-web.vercel.app';
     data.menuItems = data.menuItems.map(item => {
       if (item.imageUrl && item.imageUrl.startsWith('/')) {
-        item.imageUrl = `${baseUrl}${item.imageUrl}`;
+        item.imageUrl = `${IMAGE_BASE_URL}${item.imageUrl}`;
       }
       return item;
     });
